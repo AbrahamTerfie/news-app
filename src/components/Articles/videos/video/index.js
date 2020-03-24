@@ -4,13 +4,16 @@ import { URL } from '../../../../config';
 
 import Header from './header'
 import styles from '../../articles.module.css';
+import VideosRelated from '../../../widgets/VideosList/videosrelated/videosrelated';
 
 class VideoArticle extends Component {
 
 
     state = {
         article: [],
-        team: []
+        team: [],
+        teams: [],
+        related: []
     }
 
     componentWillMount() {
@@ -23,11 +26,29 @@ class VideoArticle extends Component {
                         this.setState({
                             article,
                             team: response.data
-                        })
+                        });
+                        this.getRelated();
                     })
             })
 
     }
+    getRelated = () => {
+        axios.get(`${URL}/teams`)
+            .then(response => {
+                let teams = response.data
+
+                axios.get(`${URL}/videos?q=${this.state.team[0].city}&_limit=3`)
+                    .then(response => {
+                        this.setState({
+                            teams,
+                            related: response.data
+                        })
+                    })
+
+            })
+    }
+
+
     render() {
 
         const article = this.state.article;
@@ -35,7 +56,24 @@ class VideoArticle extends Component {
         return (
             <div>
                 <Header teamData={team[0]} />
-                video article
+                <div className={styles.videoWrapper}>
+                    <h1>{article.title}</h1>
+                    <iframe
+                        title="videoplayer"
+                        width="100%"
+                        height="300px"
+                        src={`https://www.youtube.com/embed/${article.url}`}
+
+                    >
+
+                    </iframe>
+                </div>
+
+                <VideosRelated
+                    data={this.state.related}
+                    team={this.state.teams}
+                />
+
             </div>
         )
     }
