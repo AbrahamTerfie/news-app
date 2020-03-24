@@ -30,7 +30,9 @@ class VideosList extends Component {
         axios.get(`${URL}/videos?_start=${start}&_end=${end}`)
             .then(response => {
                 this.setState({
-                    videos: [...this.state.videos, ...response.data]
+                    videos: [...this.state.videos, ...response.data],
+                    start,
+                    end
                 })
             })
     }
@@ -39,48 +41,49 @@ class VideosList extends Component {
 
     renderVideos = () => {
         let template = null;
-        switch (this.props.type){
-            case('card'):
-            template = <VideosListTemplate data={this.state.videos} teams={this.state.teams} />
-            break;
+        switch (this.props.type) {
+            case ('card'):
+                template = <VideosListTemplate data={this.state.videos} teams={this.state.teams} />
+                break;
             default:
-                template= null
+                template = null
         }
         return template;
     }
 
 
-        loadmore = () => {
+    loadmore = () => {
+        let end = this.state.end + this.state.amount;
+        this.request(this.state.end, end)
 
-
-        }
-        renderButton = () => {
-            return this.props.loadmore ?
-                <Buttons
-                    type="loadmore"
-                    loadmore={() => this.loadmore()}
-                    cta="Load More Videos"
-                />
-                :
-                <Buttons type="linkTo" cta="More Videos" linkTo="/" />
-        }
-
-        renderTitle = () => {
-            return this.props.title ?
-                <h3><strong> NBA</strong> videos </h3>
-                : null
-        }
-        render() {
-           
-            return (
-                <div className={styles.VideosList_wrapper}>
-                    {this.renderTitle()}
-
-                    {this.renderVideos()}
-                    {this.renderButton()}
-                </div>
-            )
-        }
+    }
+    renderButton = () => {
+        return this.props.loadmore ?
+            <Buttons
+                type="loadmore"
+                loadmore={() => this.loadmore()}
+                cta="Load More Videos"
+            />
+            :
+            <Buttons type="linkTo" cta="More Videos" linkTo="/" />
     }
 
-    export default VideosList;
+    renderTitle = () => {
+        return this.props.title ?
+            <h3><strong> NBA</strong> videos </h3>
+            : null
+    }
+    render() {
+
+        return (
+            <div className={styles.VideosList_wrapper}>
+                {this.renderTitle()}
+
+                {this.renderVideos()}
+                {this.renderButton()}
+            </div>
+        )
+    }
+}
+
+export default VideosList;
